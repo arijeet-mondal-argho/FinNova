@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "FinNova"
+version = "1.0.0"
+id = "artifacts/finnova"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23742
+
+[services.development]
+run = "pnpm --filter @workspace/finnova run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/finnova", "run", "build" ]
+publicDir = "artifacts/finnova/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23742"
+BASE_PATH = "/"

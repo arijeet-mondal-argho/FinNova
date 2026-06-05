@@ -3,20 +3,32 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: FinNova API - Financial management app for Bangladeshi undergraduates
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: allowance
+    description: Monthly allowance management
+  - name: expenses
+    description: Expense tracking
+  - name: goals
+    description: Savings goals
+  - name: dashboard
+    description: Dashboard summaries and analytics
+  - name: lessons
+    description: Learning content
+  - name: achievements
+    description: Badges and achievements
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +36,315 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # --- Allowance ---
+  /allowance/current:
+    get:
+      operationId: getCurrentAllowance
+      tags: [allowance]
+      summary: Get current month's allowance
+      responses:
+        "200":
+          description: Current allowance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Allowance"
+        "404":
+          description: No allowance set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /allowance:
+    post:
+      operationId: setAllowance
+      tags: [allowance]
+      summary: Set monthly allowance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AllowanceInput"
+      responses:
+        "201":
+          description: Allowance set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Allowance"
+    get:
+      operationId: getAllowanceHistory
+      tags: [allowance]
+      summary: Get allowance history
+      responses:
+        "200":
+          description: List of past allowances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Allowance"
+
+  # --- Expenses ---
+  /expenses:
+    get:
+      operationId: listExpenses
+      tags: [expenses]
+      summary: List expenses
+      parameters:
+        - name: month
+          in: query
+          schema:
+            type: string
+          description: "Filter by month (YYYY-MM)"
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by category slug
+      responses:
+        "200":
+          description: List of expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Expense"
+    post:
+      operationId: createExpense
+      tags: [expenses]
+      summary: Add a new expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseInput"
+      responses:
+        "201":
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+
+  /expenses/{id}:
+    patch:
+      operationId: updateExpense
+      tags: [expenses]
+      summary: Update an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseUpdate"
+      responses:
+        "200":
+          description: Expense updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteExpense
+      tags: [expenses]
+      summary: Delete an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # --- Goals ---
+  /goals:
+    get:
+      operationId: listGoals
+      tags: [goals]
+      summary: List savings goals
+      responses:
+        "200":
+          description: List of goals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Goal"
+    post:
+      operationId: createGoal
+      tags: [goals]
+      summary: Create a savings goal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoalInput"
+      responses:
+        "201":
+          description: Goal created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Goal"
+
+  /goals/{id}:
+    patch:
+      operationId: updateGoal
+      tags: [goals]
+      summary: Update a savings goal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GoalUpdate"
+      responses:
+        "200":
+          description: Goal updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Goal"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteGoal
+      tags: [goals]
+      summary: Delete a savings goal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # --- Dashboard (wow endpoints) ---
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get current month's financial summary
+      responses:
+        "200":
+          description: Financial summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/category-breakdown:
+    get:
+      operationId: getCategoryBreakdown
+      tags: [dashboard]
+      summary: Spending breakdown by category for current month
+      responses:
+        "200":
+          description: Category breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategorySpend"
+
+  /dashboard/monthly-trend:
+    get:
+      operationId: getMonthlyTrend
+      tags: [dashboard]
+      summary: Spending trend for the last 6 months
+      responses:
+        "200":
+          description: Monthly trend data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonthlyTrend"
+
+  # --- Lessons ---
+  /lessons/finance:
+    get:
+      operationId: listFinanceLessons
+      tags: [lessons]
+      summary: Get financial literacy lessons
+      responses:
+        "200":
+          description: Finance lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lesson"
+
+  /lessons/ceo:
+    get:
+      operationId: listCeoLessons
+      tags: [lessons]
+      summary: Get CEO and unicorn founder mindset lessons
+      responses:
+        "200":
+          description: CEO lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lesson"
+
+  # --- Achievements ---
+  /achievements:
+    get:
+      operationId: listAchievements
+      tags: [achievements]
+      summary: Get all achievements with unlock status
+      responses:
+        "200":
+          description: Achievements list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Achievement"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +355,299 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    Allowance:
+      type: object
+      properties:
+        id:
+          type: integer
+        month:
+          type: string
+          description: "YYYY-MM format"
+        totalAmount:
+          type: number
+        foodBudget:
+          type: number
+        transportBudget:
+          type: number
+        savingsBudget:
+          type: number
+        studyBudget:
+          type: number
+        personalBudget:
+          type: number
+        createdAt:
+          type: string
+      required:
+        - id
+        - month
+        - totalAmount
+        - foodBudget
+        - transportBudget
+        - savingsBudget
+        - studyBudget
+        - personalBudget
+        - createdAt
+
+    AllowanceInput:
+      type: object
+      properties:
+        month:
+          type: string
+          description: "YYYY-MM format"
+        totalAmount:
+          type: number
+        foodBudget:
+          type: number
+        transportBudget:
+          type: number
+        savingsBudget:
+          type: number
+        studyBudget:
+          type: number
+        personalBudget:
+          type: number
+      required:
+        - month
+        - totalAmount
+        - foodBudget
+        - transportBudget
+        - savingsBudget
+        - studyBudget
+        - personalBudget
+
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+        category:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+          description: "YYYY-MM-DD"
+        createdAt:
+          type: string
+      required:
+        - id
+        - amount
+        - category
+        - description
+        - date
+        - createdAt
+
+    ExpenseInput:
+      type: object
+      properties:
+        amount:
+          type: number
+        category:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+          description: "YYYY-MM-DD"
+      required:
+        - amount
+        - category
+        - description
+        - date
+
+    ExpenseUpdate:
+      type: object
+      properties:
+        amount:
+          type: number
+        category:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+
+    Goal:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        targetAmount:
+          type: number
+        savedAmount:
+          type: number
+        deadline:
+          type: ["string", "null"]
+          description: "YYYY-MM-DD"
+        completed:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - targetAmount
+        - savedAmount
+        - completed
+        - deadline
+        - createdAt
+
+    GoalInput:
+      type: object
+      properties:
+        title:
+          type: string
+        targetAmount:
+          type: number
+        savedAmount:
+          type: number
+        deadline:
+          type: ["string", "null"]
+      required:
+        - title
+        - targetAmount
+        - savedAmount
+
+    GoalUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        targetAmount:
+          type: number
+        savedAmount:
+          type: number
+        deadline:
+          type: ["string", "null"]
+        completed:
+          type: boolean
+
+    DashboardSummary:
+      type: object
+      properties:
+        month:
+          type: string
+        totalAllowance:
+          type: number
+        totalSpent:
+          type: number
+        totalRemaining:
+          type: number
+        savingsRate:
+          type: number
+        totalSaved:
+          type: number
+        expenseCount:
+          type: integer
+        budgetUtilization:
+          type: number
+      required:
+        - month
+        - totalAllowance
+        - totalSpent
+        - totalRemaining
+        - savingsRate
+        - totalSaved
+        - expenseCount
+        - budgetUtilization
+
+    CategorySpend:
+      type: object
+      properties:
+        category:
+          type: string
+        label:
+          type: string
+        spent:
+          type: number
+        budget:
+          type: number
+        remaining:
+          type: number
+        percentage:
+          type: number
+      required:
+        - category
+        - label
+        - spent
+        - budget
+        - remaining
+        - percentage
+
+    MonthlyTrend:
+      type: object
+      properties:
+        month:
+          type: string
+        totalSpent:
+          type: number
+        totalAllowance:
+          type: number
+        savingsRate:
+          type: number
+      required:
+        - month
+        - totalSpent
+        - totalAllowance
+        - savingsRate
+
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        source:
+          type: string
+        order:
+          type: integer
+      required:
+        - id
+        - title
+        - content
+        - category
+        - source
+        - order
+
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        unlocked:
+          type: boolean
+        unlockedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - slug
+        - title
+        - description
+        - icon
+        - unlocked
+        - unlockedAt
