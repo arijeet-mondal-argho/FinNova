@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, PieChart, Wallet, Target, Lightbulb, Trophy } from "lucide-react";
+import { Home, PieChart, Wallet, Target, Lightbulb, Trophy, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -14,6 +14,7 @@ const navItems = [
   { href: "/goals", icon: Target, label: "Goals" },
   { href: "/learn", icon: Lightbulb, label: "Learn" },
   { href: "/achievements", icon: Trophy, label: "Awards" },
+  { href: "/chat", icon: MessageCircle, label: "Advisor" },
 ];
 
 export function Layout({ children }: LayoutProps) {

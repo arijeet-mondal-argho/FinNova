@@ -11,6 +11,7 @@ import Budget from "@/pages/budget";
 import Goals from "@/pages/goals";
 import Learn from "@/pages/learn";
 import Achievements from "@/pages/achievements";
+import Chat from "@/pages/chat";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ function Router() {
         <Route path="/goals" component={Goals} />
         <Route path="/learn" component={Learn} />
         <Route path="/achievements" component={Achievements} />
+        <Route path="/chat" component={Chat} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
